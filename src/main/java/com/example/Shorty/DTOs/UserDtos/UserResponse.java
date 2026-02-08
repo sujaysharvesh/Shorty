@@ -1,5 +1,6 @@
 package com.example.Shorty.DTOs.UserDtos;
 
+import com.example.Shorty.user.Role;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,7 +20,7 @@ public class UserResponse {
     private String username;
     private String apiKey;
     private boolean active;
-    private String role;
+    private Role role;
     private Instant createdAt;
     private Instant updatedAt;
 }

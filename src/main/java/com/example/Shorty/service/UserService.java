@@ -1,15 +1,72 @@
 package com.example.Shorty.service;
 
 
+import com.example.Shorty.DTOs.UserDtos.AuthResponse;
+import com.example.Shorty.DTOs.UserDtos.RegisterRequest;
+import com.example.Shorty.DTOs.UserDtos.UserResponse;
+import com.example.Shorty.Utils.JwtUtils;
+import com.example.Shorty.user.Role;
+import com.example.Shorty.user.User;
 import com.example.Shorty.user.UserRepo;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.apache.coyote.BadRequestException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.util.UUID;
+
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserService {
 
     private final UserRepo userRepo;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtUtils jwtUtils;
 
-    public
+    public AuthResponse registerUser(RegisterRequest request) throws BadRequestException {
+        if(userRepo.existsByEmail(request.getEmail())) {
+            throw new BadRequestException("User with email " + request.getEmail() + " already exists");
+        }
+
+        User user = User.builder()
+                .id(UUID.randomUUID().toString())
+                .email(request.getEmail())
+                .username(request.getUsername())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .apiKey(generateApiKey())
+                .isActive(true)
+                .role(Role.USER)
+                .createdAt(Instant.now())
+                .updatedAt(Instant.now())
+                .build();
+
+
+        User savedUser = userRepo.saveUser(user);
+        String token = jwtUtils.generateToken(savedUser.getId(),savedUser.getEmail());
+
+        return AuthResponse.builder()
+                .token(token)
+                .user(mapToUserResponse(savedUser))
+                .build();
+
+    }
+
+    public String generateApiKey() {
+        return "Sk_" + UUID.randomUUID().toString().replace("-", "");
+    }
+
+    private UserResponse mapToUserResponse(User user) {
+        return UserResponse.builder()
+                .userId(user.getId())
+                .email(user.getEmail())
+                .username(user.getUsername())
+                .apiKey(user.getApiKey())
+                .active(user.isActive())
+                .role(user.getRole())
+                .createdAt(user.getCreatedAt())
+                .updatedAt(user.getUpdatedAt())
+                .build();
+    }
+
 }

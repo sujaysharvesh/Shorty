@@ -1,14 +1,21 @@
 package com.example.Shorty;
 
-import jakarta.persistence.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbAttribute;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
 
 import java.time.Instant;
 
+@Getter
+@Setter
+@SuperBuilder
+@NoArgsConstructor    // ✅ REQUIRED
+@AllArgsConstructor
 @DynamoDbBean
 public abstract class BaseModel {
 
@@ -17,7 +24,7 @@ public abstract class BaseModel {
     private Instant updatedAt;
 
     @DynamoDbPartitionKey
-    @DynamoDbAttribute("id")
+    @DynamoDbAttribute("UserId")
     public String getId() {
         return id;
     }

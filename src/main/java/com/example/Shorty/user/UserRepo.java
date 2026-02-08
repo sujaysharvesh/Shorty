@@ -50,6 +50,10 @@ public class UserRepo {
 
     }
 
+    public boolean existsByEmail(String email) {
+        return findByEmail(email).isPresent();
+    }
+
 
 
 }
