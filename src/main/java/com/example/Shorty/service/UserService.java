@@ -2,16 +2,19 @@ package com.example.Shorty.service;
 
 
 import com.example.Shorty.DTOs.UserDtos.AuthResponse;
+import com.example.Shorty.DTOs.UserDtos.LoginRequest;
 import com.example.Shorty.DTOs.UserDtos.RegisterRequest;
 import com.example.Shorty.DTOs.UserDtos.UserResponse;
 import com.example.Shorty.Utils.JwtUtils;
+import com.example.Shorty.exception.BadRequestException;
+import com.example.Shorty.exception.ResourceNotFoundException;
 import com.example.Shorty.user.Role;
 import com.example.Shorty.user.User;
 import com.example.Shorty.user.UserRepo;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.BadRequestException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import software.amazon.awssdk.services.dynamodb.endpoints.internal.Value;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -24,8 +27,8 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtils jwtUtils;
 
-    public AuthResponse registerUser(RegisterRequest request) throws BadRequestException {
-        if(userRepo.existsByEmail(request.getEmail())) {
+    public UserResponse registerUser(RegisterRequest request) throws BadRequestException {
+        if (userRepo.existsByEmail(request.getEmail())) {
             throw new BadRequestException("User with email " + request.getEmail() + " already exists");
         }
 
@@ -43,13 +46,30 @@ public class UserService {
 
 
         User savedUser = userRepo.saveUser(user);
-        String token = jwtUtils.generateToken(savedUser.getId(),savedUser.getEmail());
+
+        return mapToUserResponse(user);
+
+    }
+
+    public AuthResponse loginUser(LoginRequest request) throws BadRequestException, ResourceNotFoundException {
+
+        User user = userRepo.findByEmail(request.getEmail()).orElseThrow(
+                () -> new ResourceNotFoundException("User With Email Not Found")
+        );
+
+        if(!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new BadRequestException("Invalid Credential");
+        }
+
+        if(!user.isActive()) {
+            throw new BadRequestException("User Account Is Not Active");
+        }
+
+        String token = jwtUtils.generateToken(user.getId(),user.getEmail());
 
         return AuthResponse.builder()
                 .token(token)
-                .user(mapToUserResponse(savedUser))
                 .build();
-
     }
 
     public String generateApiKey() {
