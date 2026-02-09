@@ -2,7 +2,7 @@ package com.example.Shorty.service;
 
 
 import com.example.Shorty.DTOs.UserDtos.AuthResponse;
-import com.example.Shorty.DTOs.UserDtos.LoginRequest;
+import com.example.Shorty.DTOs.UserDtos.CredentialsRequest;
 import com.example.Shorty.DTOs.UserDtos.RegisterRequest;
 import com.example.Shorty.DTOs.UserDtos.UserResponse;
 import com.example.Shorty.Utils.JwtUtils;
@@ -14,7 +14,6 @@ import com.example.Shorty.user.UserRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import software.amazon.awssdk.services.dynamodb.endpoints.internal.Value;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -27,7 +26,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtils jwtUtils;
 
-    public UserResponse registerUser(RegisterRequest request) throws BadRequestException {
+    public UserResponse registerUser(RegisterRequest request) {
         if (userRepo.existsByEmail(request.getEmail())) {
             throw new BadRequestException("User with email " + request.getEmail() + " already exists");
         }
@@ -51,26 +50,44 @@ public class UserService {
 
     }
 
-    public AuthResponse loginUser(LoginRequest request) throws BadRequestException, ResourceNotFoundException {
+    public AuthResponse loginUser(CredentialsRequest request) {
 
-        User user = userRepo.findByEmail(request.getEmail()).orElseThrow(
-                () -> new ResourceNotFoundException("User With Email Not Found")
-        );
+        User user = validateUser(request);
 
-        if(!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new BadRequestException("Invalid Credential");
-        }
-
-        if(!user.isActive()) {
-            throw new BadRequestException("User Account Is Not Active");
-        }
-
-        String token = jwtUtils.generateToken(user.getId(),user.getEmail());
+        String token = jwtUtils.generateToken(user.getId(), user.getEmail());
 
         return AuthResponse.builder()
                 .token(token)
                 .build();
     }
+
+
+    public String deactivateUser(CredentialsRequest request) {
+
+        User user = validateUser(request);
+
+        user.setActive(false);
+        userRepo.saveUser(user);
+
+        return "User deactivated successfully";
+    }
+
+    private User validateUser(CredentialsRequest request) {
+
+        User user = userRepo.findByEmail(request.getEmail())
+                .orElseThrow(() -> new ResourceNotFoundException("User with email not found"));
+
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new BadRequestException("Invalid credentials");
+        }
+
+        if (!user.isActive()) {
+            throw new BadRequestException("User account is not active");
+        }
+
+        return user;
+    }
+
 
     public String generateApiKey() {
         return "Sk_" + UUID.randomUUID().toString().replace("-", "");
