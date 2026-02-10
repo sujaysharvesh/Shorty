@@ -8,9 +8,11 @@ import com.example.Shorty.DTOs.UserDtos.UserResponse;
 import com.example.Shorty.Utils.JwtUtils;
 import com.example.Shorty.exception.BadRequestException;
 import com.example.Shorty.exception.ResourceNotFoundException;
+import com.example.Shorty.security.CookieBuilder;
 import com.example.Shorty.user.Role;
 import com.example.Shorty.user.User;
 import com.example.Shorty.user.UserRepo;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,7 @@ public class UserService {
     private final UserRepo userRepo;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtils jwtUtils;
+    private final CookieBuilder cookieBuilder;
 
     public UserResponse registerUser(RegisterRequest request) {
         if (userRepo.existsByEmail(request.getEmail())) {
@@ -50,15 +53,12 @@ public class UserService {
 
     }
 
-    public AuthResponse loginUser(CredentialsRequest request) {
+    public void loginUser(CredentialsRequest request, HttpServletResponse response) {
 
         User user = validateUser(request);
-
         String token = jwtUtils.generateToken(user.getId(), user.getEmail());
 
-        return AuthResponse.builder()
-                .token(token)
-                .build();
+        cookieBuilder.setJwtCookie(response, token);
     }
 
 
@@ -91,6 +91,12 @@ public class UserService {
 
     public String generateApiKey() {
         return "Sk_" + UUID.randomUUID().toString().replace("-", "");
+    }
+
+    public UserResponse getUserById(String userId) {
+        User user = userRepo.findByUserId(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+        return mapToUserResponse(user);
     }
 
     private UserResponse mapToUserResponse(User user) {
