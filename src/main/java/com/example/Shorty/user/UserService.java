@@ -1,7 +1,6 @@
-package com.example.Shorty.service;
+package com.example.Shorty.user;
 
 
-import com.example.Shorty.DTOs.UserDtos.AuthResponse;
 import com.example.Shorty.DTOs.UserDtos.CredentialsRequest;
 import com.example.Shorty.DTOs.UserDtos.RegisterRequest;
 import com.example.Shorty.DTOs.UserDtos.UserResponse;
@@ -9,9 +8,7 @@ import com.example.Shorty.Utils.JwtUtils;
 import com.example.Shorty.exception.BadRequestException;
 import com.example.Shorty.exception.ResourceNotFoundException;
 import com.example.Shorty.security.CookieBuilder;
-import com.example.Shorty.user.Role;
-import com.example.Shorty.user.User;
-import com.example.Shorty.user.UserRepo;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -97,6 +94,10 @@ public class UserService {
         User user = userRepo.findByUserId(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
         return mapToUserResponse(user);
+    }
+
+    public void logout(HttpServletResponse response) {
+        cookieBuilder.logoutCookie(response);
     }
 
     private UserResponse mapToUserResponse(User user) {

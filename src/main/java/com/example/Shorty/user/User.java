@@ -20,6 +20,7 @@ public class User extends BaseModel {
     private Role role;
     private String email;
     private String password;
+    private Provider provider;
     private String providerId;
     private String apiKey;
     private boolean isActive;
@@ -44,6 +45,11 @@ public class User extends BaseModel {
     @DynamoDbSecondaryPartitionKey(indexNames = "apiKey-index")
     public String getApiKey() {
         return apiKey;
+    }
+
+    @DynamoDbAttribute("provider")
+    public Provider getProvider() {
+        return provider;
     }
 
     @DynamoDbAttribute("providerId")

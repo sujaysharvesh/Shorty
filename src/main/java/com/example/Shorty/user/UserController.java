@@ -1,4 +1,4 @@
-package com.example.Shorty.controller;
+package com.example.Shorty.user;
 
 
 
@@ -8,7 +8,6 @@ import com.example.Shorty.DTOs.UserDtos.RegisterRequest;
 import com.example.Shorty.DTOs.UserDtos.UserResponse;
 import com.example.Shorty.exception.BadRequestException;
 import com.example.Shorty.exception.ResourceNotFoundException;
-import com.example.Shorty.service.UserService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -69,6 +68,12 @@ public class UserController {
 
         userService.loginUser(request, response);
         return ResponseEntity.status(HttpStatus.OK).body(AuthResponse.builder().message("Login successful").build());
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(HttpServletResponse response) {
+        userService.logout(response);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/delete")

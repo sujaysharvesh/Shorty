@@ -51,7 +51,7 @@ public class CookieBuilder {
 
     }
 
-    public Cookie logoutCookie() {
+    public void logoutCookie(HttpServletResponse response) {
         Cookie cookie = new Cookie(jwtCookieName, "");
         cookie.setHttpOnly(true);
         cookie.setSecure(isProduction());
@@ -61,7 +61,8 @@ public class CookieBuilder {
         if (!cookieDomain.isEmpty() && !cookieDomain.contains("localhost")) {
             cookie.setDomain(cookieDomain);
         }
-        return cookie;
+        response.addCookie(cookie);
+
     }
 
     private boolean isProduction() {
