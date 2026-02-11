@@ -4,6 +4,7 @@ package com.example.Shorty.Url;
 import com.example.Shorty.config.DynamoDbConfig;
 import com.example.Shorty.exception.ResourceNotFoundException;
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import software.amazon.awssdk.enhanced.dynamodb.*;
 import software.amazon.awssdk.enhanced.dynamodb.model.QueryConditional;
@@ -16,6 +17,7 @@ import java.util.concurrent.locks.LockSupport;
 import java.util.stream.Collectors;
 
 @Repository
+@RequiredArgsConstructor
 public class UrlRepo {
 
 
@@ -23,7 +25,7 @@ public class UrlRepo {
     private static final String SHORT_CODE_INDEX = "shortCode-index";
     private static final String USER_ID_INDEX = "userId-index";
 
-    private DynamoDbEnhancedClient dynamoDbConfig;
+    private final DynamoDbEnhancedClient dynamoDbConfig;
 
     private DynamoDbTable<Url> urlTable;
 
