@@ -14,7 +14,7 @@ import java.time.Instant;
 @Getter
 @Setter
 @SuperBuilder
-@NoArgsConstructor    // ✅ REQUIRED
+@NoArgsConstructor
 @AllArgsConstructor
 @DynamoDbBean
 public abstract class BaseModel {
@@ -24,7 +24,7 @@ public abstract class BaseModel {
     private Instant updatedAt;
 
     @DynamoDbPartitionKey
-    @DynamoDbAttribute("UserId")
+    @DynamoDbAttribute("id")
     public String getId() {
         return id;
     }

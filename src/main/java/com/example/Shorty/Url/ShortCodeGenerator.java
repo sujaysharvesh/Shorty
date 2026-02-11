@@ -9,9 +9,10 @@ import java.util.Random;
 @Component
 public class ShortCodeGenerator {
 
-    private static final String BASE64_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    private static final Integer SHORT_LENGTH = 7;
-    private static final Random random = new SecureRandom();
+    private static final String BASE62 =
+            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    private static final int SHORT_LENGTH = 7;
+    private static final SecureRandom random = new SecureRandom();
 
     public String generateShortCode(String urlId, String originalUrl) {
 
@@ -22,16 +23,17 @@ public class ShortCodeGenerator {
         StringBuilder shortCode = new StringBuilder();
 
         while (shortCode.length() < SHORT_LENGTH) {
-            shortCode.append(BASE64_CHARS.charAt(hash % BASE64_CHARS.length()));
-            hash = hash / BASE64_CHARS.length();
+
+            int index = Math.abs(hash % BASE62.length());
+            shortCode.append(BASE62.charAt(index));
+
+            hash = hash / BASE62.length();
 
             if (hash == 0) {
-                hash = random.nextInt();
+                hash = random.nextInt(Integer.MAX_VALUE);
             }
         }
 
         return shortCode.toString();
     }
-
-
 }

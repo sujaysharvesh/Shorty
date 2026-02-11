@@ -42,6 +42,7 @@ public class UrlService {
 
 
         Url url = Url.builder()
+                .id(urlId)
                 .originalUrl(request.getOriginalUrl())
                 .shortCode(shortCode)
                 .clickCount(0)

@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 public class UrlRepo {
 
 
-    private static final String TABLE_NAME = "Url";
+    private static final String TABLE_NAME = "Urls";
     private static final String SHORT_CODE_INDEX = "shortCode-index";
     private static final String USER_ID_INDEX = "userId-index";
 

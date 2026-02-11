@@ -26,12 +26,13 @@ public class UrlController {
     public ResponseEntity<UrlResponse> createShortUrl(
             @Valid @RequestBody CreateUrlRequest createUrlRequest) {
 
-        String userId;
-        if (getUserIdFromSecurityContext() == null) {
-            ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UrlResponse.builder().build());
-        }
-        UrlResponse url = urlService.createUrl(createUrlRequest, getUserIdFromSecurityContext());
-        return ResponseEntity.status(HttpStatus.CREATED).body(url);
+            String userId;
+            if (getUserIdFromSecurityContext() == null) {
+                ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UrlResponse.builder().build());
+            }
+            UrlResponse url = urlService.createUrl(createUrlRequest, getUserIdFromSecurityContext());
+            return ResponseEntity.status(HttpStatus.CREATED).body(url);
+
 
     }
 
