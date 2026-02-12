@@ -39,7 +39,7 @@ public class UrlRepo {
         return url;
     }
 
-    public List<Url> findByUserId(String userId) {
+    public List<Url> findUserUrls(String userId) {
 
         DynamoDbIndex<Url> userIndex = urlTable.index(USER_ID_INDEX);
 

@@ -40,11 +40,12 @@ public class Url extends BaseModel {
         return originalUrl;
     }
 
-    @DynamoDbAttribute("shortUrl")
+    @DynamoDbAttribute("shortCode")
     @DynamoDbSecondaryPartitionKey(indexNames = "shortCode-index")
     public String getShortCode() {
         return shortCode;
     }
+
 
     @DynamoDbAttribute("expiresAt")
     public Instant getExpiresAt() {

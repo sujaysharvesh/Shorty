@@ -6,14 +6,17 @@ import com.example.Shorty.DTOs.Urls.UrlResponse;
 import com.example.Shorty.exception.BadRequestException;
 import com.example.Shorty.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UrlService {
@@ -54,11 +57,11 @@ public class UrlService {
 
         Url savedUrl = urlRepo.saveUrl(url);
 
-        return mapToUrlresponse(savedUrl);
+        return mapToUrlResponse(savedUrl);
     }
 
     public String getOriginalUrl(String shortCode) {
-
+        log.info(shortCode);
         Url url = urlRepo.findByShortCode(shortCode).orElseThrow(
                 () -> new ResourceNotFoundException("Url Not Found")
         );
@@ -76,13 +79,20 @@ public class UrlService {
         return url.getOriginalUrl();
     }
 
+    public List<UrlResponse> getAllUserUrls(String userId) {
+
+        List<Url> urls = urlRepo.findUserUrls(userId);
+        return urls.stream().map(this::mapToUrlResponse).toList();
+
+    }
+
     private void incrementClickCount(Url url) {
         url.setClickCount(url.getClickCount() + 1);
         urlRepo.saveUrl(url);
 
     }
 
-    public UrlResponse mapToUrlresponse(Url url) {
+    public UrlResponse mapToUrlResponse(Url url) {
         return UrlResponse.builder()
                 .shortUrl(baseUrl + "/" + url.getShortCode())
                 .originalUrl(url.getOriginalUrl())

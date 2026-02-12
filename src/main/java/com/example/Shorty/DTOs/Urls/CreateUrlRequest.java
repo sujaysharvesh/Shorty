@@ -16,7 +16,7 @@ import lombok.*;
 public class CreateUrlRequest {
 
     @NotBlank(message = "Original URL is required")
-    @Pattern(regexp = "^https?://.*", message = "URL must start with http:// or https://")
+//    @Pattern(regexp = "^https?://.*", message = "URL must start with http:// or https://")
     private String originalUrl;
 
     private Long expiresInDays;
