@@ -34,15 +34,11 @@ public class UserController {
 
         String userId = userService.getUserIdFromSecurityContext();
 
-        if (userId == null) {
-            return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .body(ApiResponse.error("Unauthorized"));
-        }
-
         UserResponse user = userService.getUserById(userId);
 
-        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(user));
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ApiResponse.success(user));
     }
 
 
@@ -52,7 +48,9 @@ public class UserController {
             @Valid @RequestBody RegisterRequest request) {
 
         userService.registerUser(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success());
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(ApiResponse.success());
 
     }
 
@@ -61,21 +59,27 @@ public class UserController {
             @Valid @RequestBody CredentialsRequest request, HttpServletResponse response) {
 
         userService.loginUser(request, response);
-        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success("Login successful"));
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ApiResponse.success("Login successful"));
     }
 
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<String>> logout(HttpServletResponse response) {
         userService.logout(response);
-        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success("Logged out successfully"));
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ApiResponse.success("Logged out successfully"));
     }
 
     @PostMapping("/delete")
     public ResponseEntity<ApiResponse<String>> delete(
-            @Valid @RequestBody CredentialsRequest authRequest) throws BadRequestException, ResourceNotFoundException {
+            @Valid @RequestBody CredentialsRequest authRequest) {
 
         String response = userService.deactivateUser(authRequest);
-        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(response));
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ApiResponse.success(response));
 
     }
 

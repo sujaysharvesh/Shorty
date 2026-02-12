@@ -33,12 +33,6 @@ public class UrlController {
 
             String userId = userService.getUserIdFromSecurityContext();
 
-            if (userId == null) {
-                return ResponseEntity
-                        .status(HttpStatus.UNAUTHORIZED)
-                        .body(ApiResponse.error("Unauthorized"));
-            }
-
             UrlResponse url = urlService.createUrl(createUrlRequest, userId);
 
             return ResponseEntity
@@ -52,16 +46,11 @@ public class UrlController {
     public ResponseEntity<ApiResponse<List<UrlResponse>>> getUserUls() {
         String userId = userService.getUserIdFromSecurityContext();
 
-        if (userId == null) {
-            return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .body(ApiResponse.error("Unauthorized"));
-        }
-
         List<UrlResponse> response = urlService.getAllUserUrls(userId);
-        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(response));
 
-
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ApiResponse.success(response));
     }
 
 }

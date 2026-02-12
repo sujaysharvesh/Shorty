@@ -110,12 +110,16 @@ public class UserService {
             throw new UnauthorizedException("Unauthorized");
         }
 
-        CustomUserDetails user =
-                (CustomUserDetails) authentication.getPrincipal();
+        Object principal = authentication.getPrincipal();
+
+        if (!(principal instanceof CustomUserDetails user)) {
+            throw new UnauthorizedException("Invalid authentication");
+        }
 
         return user.getUserId();
-
     }
+
+
 
     private UserResponse mapToUserResponse(User user) {
         return UserResponse.builder()
