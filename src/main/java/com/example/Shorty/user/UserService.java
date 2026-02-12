@@ -5,12 +5,15 @@ import com.example.Shorty.DTOs.UserDtos.CredentialsRequest;
 import com.example.Shorty.DTOs.UserDtos.RegisterRequest;
 import com.example.Shorty.DTOs.UserDtos.UserResponse;
 import com.example.Shorty.Utils.JwtUtils;
+import com.example.Shorty.exception.UnauthorizedException;
 import com.example.Shorty.exception.BadRequestException;
 import com.example.Shorty.exception.ResourceNotFoundException;
 import com.example.Shorty.security.CookieBuilder;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -98,6 +101,23 @@ public class UserService {
 
     public void logout(HttpServletResponse response) {
         cookieBuilder.logoutCookie(response);
+    }
+
+    public String getUserIdFromSecurityContext() {
+
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()
+                || authentication instanceof AnonymousAuthenticationToken) {
+            throw new UnauthorizedException("Unauthorized");
+        }
+
+        CustomUserDetails user =
+                (CustomUserDetails) authentication.getPrincipal();
+
+        return user.getUserId();
+
     }
 
     private UserResponse mapToUserResponse(User user) {

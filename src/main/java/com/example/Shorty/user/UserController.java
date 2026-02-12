@@ -2,6 +2,7 @@ package com.example.Shorty.user;
 
 
 
+import com.example.Shorty.DTOs.ApiResponse;
 import com.example.Shorty.DTOs.UserDtos.AuthResponse;
 import com.example.Shorty.DTOs.UserDtos.CredentialsRequest;
 import com.example.Shorty.DTOs.UserDtos.RegisterRequest;
@@ -33,22 +34,19 @@ public class UserController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<UserResponse> currentUser() {
+    public ResponseEntity<ApiResponse<UserResponse>> currentUser() {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userId = userService.getUserIdFromSecurityContext();
 
-        if (authentication == null
-                || authentication instanceof AnonymousAuthenticationToken) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        if (userId == null) {
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error("Unauthorized"));
         }
-
-        String userId = (String) authentication.getPrincipal();
 
         UserResponse user = userService.getUserById(userId);
 
-        return ResponseEntity.ok(
-                user
-        );
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(user));
     }
 
 

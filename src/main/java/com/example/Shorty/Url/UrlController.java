@@ -5,6 +5,7 @@ import com.example.Shorty.DTOs.ApiResponse;
 import com.example.Shorty.DTOs.Urls.CreateUrlRequest;
 import com.example.Shorty.DTOs.Urls.UrlResponse;
 import com.example.Shorty.exception.BadRequestException;
+import com.example.Shorty.user.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,12 +25,13 @@ import java.util.List;
 public class UrlController {
 
     private final UrlService urlService;
+    private final UserService userService;
 
     @PostMapping("/create")
     public ResponseEntity<ApiResponse<UrlResponse>> createShortUrl(
             @Valid @RequestBody CreateUrlRequest createUrlRequest) {
 
-            String userId = getUserIdFromSecurityContext();
+            String userId = userService.getUserIdFromSecurityContext();
 
             if (userId == null) {
                 return ResponseEntity
@@ -47,30 +49,18 @@ public class UrlController {
 
 
     @GetMapping("/")
-    public ResponseEntity<List<UrlResponse>> getUserUls() {
-        String userId = null;
-        if (getUserIdFromSecurityContext() == null) {
-            ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(UrlResponse.builder().build());
+    public ResponseEntity<ApiResponse<List<UrlResponse>>> getUserUls() {
+        String userId = userService.getUserIdFromSecurityContext();
+
+        if (userId == null) {
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error("Unauthorized"));
         }
 
-        List<UrlResponse> response = urlService.getAllUserUrls(getUserIdFromSecurityContext());
-        response.forEach(url -> log.info("URL: {}", url));
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        List<UrlResponse> response = urlService.getAllUserUrls(userId);
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(response));
 
-
-    }
-
-    public String getUserIdFromSecurityContext() {
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null
-                || authentication instanceof AnonymousAuthenticationToken) {
-            return null;
-        }
-
-        String userId = (String) authentication.getPrincipal();
-        return userId;
 
     }
 

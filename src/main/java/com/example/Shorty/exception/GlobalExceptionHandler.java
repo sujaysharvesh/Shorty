@@ -1,12 +1,12 @@
-package com.example.Shorty.config;
+package com.example.Shorty.exception;
 
 
 import com.example.Shorty.DTOs.ApiResponse;
-import com.example.Shorty.exception.BadRequestException;
-import com.example.Shorty.exception.ResourceNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -25,7 +25,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ApiResponse<String>> handleBadRequestException(BadRequestException exception) {
 
-        log.error("BadRequest Error :" + exception.getMessage());
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(ApiResponse.error(exception.getMessage()));
@@ -46,6 +45,22 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.BAD_REQUEST)
                 .body(ApiResponse.error(errorMessage));
     }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<ApiResponse<String>> handleUnauthorizedException(AuthenticationException exception) {
+
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(ApiResponse.error(exception.getMessage()));
+    }
+
+//    @ExceptionHandler(UsernameNotFoundException.class)
+//    public ResponseEntity<ApiResponse<String>> handleUsernameNotFoundException(UsernameNotFoundException exception) {
+//        return ResponseEntity
+//                .status(HttpStatus.NOT_FOUND)
+//                .body(ApiResponse.error(exception.getMessage()));
+//    }
+
 
 
 }
