@@ -29,7 +29,7 @@ public class UserService {
     private final JwtUtils jwtUtils;
     private final CookieBuilder cookieBuilder;
 
-    public UserResponse registerUser(RegisterRequest request) {
+    public void registerUser(RegisterRequest request) {
         if (userRepo.existsByEmail(request.getEmail())) {
             throw new BadRequestException("User with email " + request.getEmail() + " already exists");
         }
@@ -48,9 +48,6 @@ public class UserService {
 
 
         User savedUser = userRepo.saveUser(user);
-
-        return mapToUserResponse(user);
-
     }
 
     public void loginUser(CredentialsRequest request, HttpServletResponse response) {
