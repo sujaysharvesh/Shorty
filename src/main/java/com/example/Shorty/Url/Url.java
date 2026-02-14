@@ -9,6 +9,7 @@ import lombok.experimental.SuperBuilder;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbAttribute;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSecondaryPartitionKey;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSecondarySortKey;
 
 import java.time.Instant;
 
@@ -30,7 +31,7 @@ public class Url extends BaseModel {
 
 
     @DynamoDbAttribute("userId")
-    @DynamoDbSecondaryPartitionKey(indexNames = "userId-index")
+    @DynamoDbSecondaryPartitionKey(indexNames = "userId-shortCode-index")
     public String getUserId() {
         return userId;
     }
@@ -42,6 +43,7 @@ public class Url extends BaseModel {
 
     @DynamoDbAttribute("shortCode")
     @DynamoDbSecondaryPartitionKey(indexNames = "shortCode-index")
+    @DynamoDbSecondarySortKey(indexNames = "userId-shortCode-index")
     public String getShortCode() {
         return shortCode;
     }

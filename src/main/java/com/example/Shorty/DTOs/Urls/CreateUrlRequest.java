@@ -19,6 +19,6 @@ public class CreateUrlRequest {
 //    @Pattern(regexp = "^https?://.*", message = "URL must start with http:// or https://")
     private String originalUrl;
 
-    private Long expiresInDays;
+    private int expiresInDays;
 
 }

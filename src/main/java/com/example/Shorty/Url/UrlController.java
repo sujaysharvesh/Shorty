@@ -27,13 +27,12 @@ public class UrlController {
     private final UrlService urlService;
     private final UserService userService;
 
-    @PostMapping("/create")
+    @PostMapping("/shorten")
     public ResponseEntity<ApiResponse<UrlResponse>> createShortUrl(
             @Valid @RequestBody CreateUrlRequest createUrlRequest) {
 
-            String userId = userService.getUserIdFromSecurityContext();
 
-            UrlResponse url = urlService.createUrl(createUrlRequest, userId);
+            UrlResponse url = urlService.createUrl(createUrlRequest);
 
             return ResponseEntity
                     .status(HttpStatus.CREATED)
@@ -44,13 +43,22 @@ public class UrlController {
 
     @GetMapping("/")
     public ResponseEntity<ApiResponse<List<UrlResponse>>> getUserUls() {
-        String userId = userService.getUserIdFromSecurityContext();
 
-        List<UrlResponse> response = urlService.getAllUserUrls(userId);
+        List<UrlResponse> response = urlService.getAllUserUrls();
 
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(ApiResponse.success(response));
     }
+
+
+    @DeleteMapping("/{shortcode}")
+    public ResponseEntity<Void> deleteUrl(
+            @PathVariable String shortcode
+    ) {
+        urlService.deleteUrl(shortcode);
+        return ResponseEntity.noContent().build();
+    }
+
 
 }

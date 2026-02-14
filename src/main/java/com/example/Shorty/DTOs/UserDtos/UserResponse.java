@@ -15,10 +15,10 @@ import java.time.Instant;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserResponse {
-    private String userId;
+//    private String userId;
     private String email;
     private String username;
-    private String apiKey;
+//    private String apiKey;
     private boolean active;
     private Role role;
     private Instant createdAt;

@@ -5,6 +5,7 @@ import com.example.Shorty.DTOs.Urls.CreateUrlRequest;
 import com.example.Shorty.DTOs.Urls.UrlResponse;
 import com.example.Shorty.exception.BadRequestException;
 import com.example.Shorty.exception.ResourceNotFoundException;
+import com.example.Shorty.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.validator.routines.UrlValidator;
@@ -26,22 +27,22 @@ public class UrlService {
 
     private final UrlRepo urlRepo;
     private final ShortCodeGenerator shortCodeGenerator;
+    private final UserService userService;
 
     @Value("${app.base-url}")
     private String baseUrl;
 
     private final UrlValidator urlValidator = new UrlValidator(new String[]{"http", "https"});
 
-    public UrlResponse createUrl(CreateUrlRequest request, String userId) {
+    public UrlResponse createUrl(CreateUrlRequest request) {
+
+        String userId = userService.getUserIdFromSecurityContext();
 
         if(!urlValidator.isValid(request.getOriginalUrl())) {
             throw new BadRequestException("Invalid Url format");
         }
 
-        Instant expiresIn = null;
-        if(request.getExpiresInDays() != null) {
-            expiresIn = Instant.now().plus(request.getExpiresInDays(), ChronoUnit.DAYS);
-        }
+        Instant expiresIn = Instant.now().plus(request.getExpiresInDays(), ChronoUnit.DAYS);
 
         String urlId = UUID.randomUUID().toString();
         String shortCode = shortCodeGenerator.generateShortCode(urlId, request.getOriginalUrl());
@@ -82,11 +83,19 @@ public class UrlService {
         return url.getOriginalUrl();
     }
 
-    public List<UrlResponse> getAllUserUrls(String userId) {
+    public List<UrlResponse> getAllUserUrls() {
+        String userId = userService.getUserIdFromSecurityContext();
 
         List<Url> urls = urlRepo.findUserUrls(userId);
         return urls.stream().map(this::mapToUrlResponse).toList();
 
+    }
+
+    public String deleteUrl(String shortCode) {
+        String userId = userService.getUserIdFromSecurityContext();
+
+        urlRepo.deleteByShortCodeAndUserId(shortCode, userId);
+        return "Done";
     }
 
     private void incrementClickCount(Url url) {

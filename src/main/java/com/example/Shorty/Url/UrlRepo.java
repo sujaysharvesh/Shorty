@@ -3,6 +3,7 @@ package com.example.Shorty.Url;
 
 import com.example.Shorty.config.DynamoDbConfig;
 import com.example.Shorty.exception.ResourceNotFoundException;
+import com.example.Shorty.exception.UnauthorizedException;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -24,6 +25,7 @@ public class UrlRepo {
     private static final String TABLE_NAME = "Urls";
     private static final String SHORT_CODE_INDEX = "shortCode-index";
     private static final String USER_ID_INDEX = "userId-index";
+    private static final String USER_SHORT_CODE_INDEX = "userId-shortCode-index";
 
     private final DynamoDbEnhancedClient dynamoDbConfig;
 
@@ -41,7 +43,7 @@ public class UrlRepo {
 
     public List<Url> findUserUrls(String userId) {
 
-        DynamoDbIndex<Url> userIndex = urlTable.index(USER_ID_INDEX);
+        DynamoDbIndex<Url> userIndex = urlTable.index(USER_SHORT_CODE_INDEX);
 
         QueryConditional queryConditional = QueryConditional
                 .keyEqualTo(Key.builder().partitionValue(userId).build());
@@ -64,6 +66,30 @@ public class UrlRepo {
                 .findFirst()
                 .flatMap(page -> page.items().stream().findFirst());
     }
+
+    public Optional<Url> findByShortCodeAndUserId(String shortCode, String userId) {
+        DynamoDbIndex<Url> index = urlTable.index(USER_SHORT_CODE_INDEX);
+
+        QueryConditional qc = QueryConditional.keyEqualTo(
+                Key.builder()
+                        .partitionValue(userId)
+                        .sortValue(shortCode)
+                        .build()
+        );
+
+        return index.query(qc)
+                .stream()
+                .findFirst()
+                .flatMap(page -> page.items().stream().findFirst());
+    }
+
+    public void deleteByShortCodeAndUserId(String shortCode, String userId) {
+        Url url = findByShortCodeAndUserId(shortCode, userId)
+                .orElseThrow(() -> new ResourceNotFoundException("URL not found"));
+
+        urlTable.deleteItem(url);
+    }
+
 
     public boolean exitsByShortCode(String shortCode) {
         return findByShortCode(shortCode).isPresent();
