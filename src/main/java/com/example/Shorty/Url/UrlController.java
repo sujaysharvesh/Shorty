@@ -6,6 +6,8 @@ import com.example.Shorty.DTOs.Urls.CreateUrlRequest;
 import com.example.Shorty.DTOs.Urls.UrlResponse;
 import com.example.Shorty.exception.BadRequestException;
 import com.example.Shorty.user.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,15 +28,21 @@ public class UrlController {
 
     private final UrlService urlService;
     private final UserService userService;
+    private final RedisCacheService cacheService;
 
     @PostMapping("/shorten")
     public ResponseEntity<ApiResponse<UrlResponse>> createShortUrl(
-            @Valid @RequestBody CreateUrlRequest createUrlRequest) {
+            @Valid @RequestBody CreateUrlRequest createUrlRequest,
+            HttpServletRequest request) {
 
+        String ipAddress = request.getRemoteAddr();
+        if (cacheService.isRateLimited(ipAddress, 10, 60)) {
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                    .body(ApiResponse.error("Try again later."));
+        }
+        UrlResponse url = urlService.createUrl(createUrlRequest);
 
-            UrlResponse url = urlService.createUrl(createUrlRequest);
-
-            return ResponseEntity
+        return ResponseEntity
                     .status(HttpStatus.CREATED)
                     .body(ApiResponse.success(url));
 

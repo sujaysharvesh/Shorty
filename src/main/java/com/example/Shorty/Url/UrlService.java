@@ -28,6 +28,7 @@ public class UrlService {
     private final UrlRepo urlRepo;
     private final ShortCodeGenerator shortCodeGenerator;
     private final UserService userService;
+    private final RedisCacheService cacheService;
 
     @Value("${app.base-url}")
     private String baseUrl;
@@ -60,12 +61,17 @@ public class UrlService {
                 .build();
 
         Url savedUrl = urlRepo.saveUrl(url);
-
+        cacheService.cacheUrl(savedUrl.getShortCode(), savedUrl.getOriginalUrl());
         return mapToUrlResponse(savedUrl);
     }
 
     public String getOriginalUrl(String shortCode) {
-        log.info(shortCode);
+
+        String cachedUrl = cacheService.getCachedUrl(shortCode);
+        if (cachedUrl != null) {
+            return cachedUrl;
+        }
+
         Url url = urlRepo.findByShortCode(shortCode).orElseThrow(
                 () -> new ResourceNotFoundException("Url Not Found")
         );
@@ -95,6 +101,7 @@ public class UrlService {
         String userId = userService.getUserIdFromSecurityContext();
 
         urlRepo.deleteByShortCodeAndUserId(shortCode, userId);
+        cacheService.invalidateCache(shortCode);
         return "Done";
     }
 
