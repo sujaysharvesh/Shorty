@@ -43,7 +43,7 @@ public class UrlService {
             throw new BadRequestException("Invalid Url format");
         }
 
-        Instant expiresIn = Instant.now().plus(request.getExpiresInDays(), ChronoUnit.DAYS);
+        Instant expiresIn = Instant.now().plus(request.getExpiresInDays(), ChronoUnit.MINUTES);
 
         String urlId = UUID.randomUUID().toString();
         String shortCode = shortCodeGenerator.generateShortCode(urlId, request.getOriginalUrl());

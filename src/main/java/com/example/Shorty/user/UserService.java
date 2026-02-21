@@ -31,7 +31,7 @@ public class UserService {
 
     public String registerUser(RegisterRequest request) {
         if (userRepo.existsByEmail(request.getEmail())) {
-            throw new BadRequestException("User with email " + request.getEmail() + " already exists");
+            throw new BadRequestException("User already exists with this email");
         }
 
         User user = User.builder()

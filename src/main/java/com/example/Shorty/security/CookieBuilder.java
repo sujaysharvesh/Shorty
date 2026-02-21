@@ -52,17 +52,21 @@ public class CookieBuilder {
     }
 
     public void logoutCookie(HttpServletResponse response) {
-        Cookie cookie = new Cookie(jwtCookieName, "");
-        cookie.setHttpOnly(true);
-        cookie.setSecure(isProduction());
-        cookie.setPath(cookiePath);
-        cookie.setMaxAge(0);
+
+        ResponseCookie.ResponseCookieBuilder cookieBuilder =
+                ResponseCookie.from(jwtCookieName, "")
+                        .httpOnly(true)
+                        .secure(isProduction())
+                        .path(cookiePath)
+                        .maxAge(0)
+                        .sameSite(sameSite);
 
         if (!cookieDomain.isEmpty() && !cookieDomain.contains("localhost")) {
-            cookie.setDomain(cookieDomain);
+            cookieBuilder.domain(cookieDomain);
         }
-        response.addCookie(cookie);
 
+        ResponseCookie responseCookie = cookieBuilder.build();
+        response.addHeader(HttpHeaders.SET_COOKIE, responseCookie.toString());
     }
 
     private boolean isProduction() {
