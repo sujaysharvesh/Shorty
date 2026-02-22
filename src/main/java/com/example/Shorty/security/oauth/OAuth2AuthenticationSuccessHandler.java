@@ -61,7 +61,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         String email = extractEmail(provider, attributes);
         String name = extractName(provider, attributes);
         String providerId = extractProviderId(provider, attributes);
-        String profileImageUrl = extractProfileImageUrl(provider, attributes);
+//        String profileImageUrl = extractProfileImageUrl(provider, attributes);
 
         Provider actualProvider = switch (provider.toUpperCase()) {
             case "GOOGLE" -> Provider.GOOGLE;

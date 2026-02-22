@@ -74,16 +74,16 @@ public class SecurityConfig {
                             );
                         })
                 )
-//                .oauth2Login(oauth2 -> oauth2
-//                        .authorizationEndpoint(authorization -> authorization
-//                                .baseUri("/oauth2/authorize")
-//                        )
-//                        .redirectionEndpoint(redirection -> redirection
-//                                .baseUri("/login/oauth2/code/*")
-//                        )
-//                        .successHandler(oauth2AuthenticationSuccessHandler)
-//                        .failureHandler(oauth2AuthenticationFailureHandler)
-//                )
+                .oauth2Login(oauth2 -> oauth2
+                        .authorizationEndpoint(authorization -> authorization
+                                .baseUri("/oauth2/authorize")
+                        )
+                        .redirectionEndpoint(redirection -> redirection
+                                .baseUri("/login/oauth2/code/*")
+                        )
+                        .successHandler(oauth2AuthenticationSuccessHandler)
+                        .failureHandler(oauth2AuthenticationFailureHandler)
+                )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
 

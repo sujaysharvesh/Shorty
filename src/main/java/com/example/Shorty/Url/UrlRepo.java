@@ -1,38 +1,34 @@
 package com.example.Shorty.Url;
 
 
-import com.example.Shorty.config.DynamoDbConfig;
 import com.example.Shorty.exception.ResourceNotFoundException;
-import com.example.Shorty.exception.UnauthorizedException;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import software.amazon.awssdk.enhanced.dynamodb.*;
 import software.amazon.awssdk.enhanced.dynamodb.model.QueryConditional;
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
+import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
+import software.amazon.awssdk.services.dynamodb.model.UpdateItemRequest;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.locks.LockSupport;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
 @RequiredArgsConstructor
 public class UrlRepo {
 
-
     private static final String TABLE_NAME = "Urls";
     private static final String SHORT_CODE_INDEX = "shortCode-index";
-    private static final String USER_ID_INDEX = "userId-index";
     private static final String USER_SHORT_CODE_INDEX = "userId-shortCode-index";
 
     private final DynamoDbEnhancedClient dynamoDbConfig;
+    private final DynamoDbClient dynamoDbClient;
 
     private DynamoDbTable<Url> urlTable;
 
     @PostConstruct
-    public void  init() {
+    public void init() {
         urlTable = dynamoDbConfig.table(TABLE_NAME, TableSchema.fromBean(Url.class));
     }
 
@@ -42,7 +38,6 @@ public class UrlRepo {
     }
 
     public List<Url> findUserUrls(String userId) {
-
         DynamoDbIndex<Url> userIndex = urlTable.index(USER_SHORT_CODE_INDEX);
 
         QueryConditional queryConditional = QueryConditional
@@ -55,7 +50,6 @@ public class UrlRepo {
     }
 
     public Optional<Url> findByShortCode(String shortCode) {
-
         DynamoDbIndex<Url> codeIndex = urlTable.index(SHORT_CODE_INDEX);
 
         QueryConditional conditional = QueryConditional
@@ -91,12 +85,32 @@ public class UrlRepo {
     }
 
 
+    public void incrementClickCount(String urlId, long incrementBy) {
+
+        Map<String, AttributeValue> key = Map.of(
+                "id", AttributeValue.builder().s(urlId).build()
+        );
+
+        Map<String, AttributeValue> values = Map.of(
+                ":inc", AttributeValue.builder().n(String.valueOf(incrementBy)).build()
+        );
+
+        UpdateItemRequest request = UpdateItemRequest.builder()
+                .tableName(TABLE_NAME)
+                .key(key)
+                .updateExpression("ADD clickCount :inc")
+                .conditionExpression("attribute_exists(id)")
+                .expressionAttributeValues(values)
+                .build();
+
+        dynamoDbClient.updateItem(request);
+    }
+
     public boolean exitsByShortCode(String shortCode) {
         return findByShortCode(shortCode).isPresent();
     }
 
     public void deleteByShortCode(String shortCode) {
-
         Url url = findByShortCode(shortCode)
                 .orElseThrow(() -> new ResourceNotFoundException("URL not found"));
 
@@ -106,7 +120,4 @@ public class UrlRepo {
 
         urlTable.deleteItem(key);
     }
-
-
-
 }

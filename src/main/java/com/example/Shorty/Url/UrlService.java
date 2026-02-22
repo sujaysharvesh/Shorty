@@ -10,9 +10,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -39,15 +36,14 @@ public class UrlService {
 
         String userId = userService.getUserIdFromSecurityContext();
 
-        if(!urlValidator.isValid(request.getOriginalUrl())) {
+        if (!urlValidator.isValid(request.getOriginalUrl())) {
             throw new BadRequestException("Invalid Url format");
         }
 
-        Instant expiresIn = Instant.now().plus(request.getExpiresInDays(), ChronoUnit.MINUTES);
+        Instant expiresIn = Instant.now().plus(request.getExpiresInMin(), ChronoUnit.MINUTES);
 
         String urlId = UUID.randomUUID().toString();
         String shortCode = shortCodeGenerator.generateShortCode(urlId, request.getOriginalUrl());
-
 
         Url url = Url.builder()
                 .id(urlId)
@@ -61,7 +57,7 @@ public class UrlService {
                 .build();
 
         Url savedUrl = urlRepo.saveUrl(url);
-        cacheService.cacheUrl(savedUrl.getShortCode(), savedUrl.getOriginalUrl());
+        cacheService.cacheUrl(savedUrl.getShortCode(), savedUrl.getOriginalUrl(), savedUrl.getId());
         return mapToUrlResponse(savedUrl);
     }
 
@@ -69,6 +65,7 @@ public class UrlService {
 
         String cachedUrl = cacheService.getCachedUrl(shortCode);
         if (cachedUrl != null) {
+            cacheService.increaseCount(shortCode);
             return cachedUrl;
         }
 
@@ -76,7 +73,7 @@ public class UrlService {
                 () -> new ResourceNotFoundException("Url Not Found")
         );
 
-        if(url.getExpiresAt() != null && url.getExpiresAt().isBefore(Instant.now())) {
+        if (url.getExpiresAt() != null && url.getExpiresAt().isBefore(Instant.now())) {
             throw new ResourceNotFoundException("Url Not Found");
         }
 
@@ -94,7 +91,6 @@ public class UrlService {
 
         List<Url> urls = urlRepo.findUserUrls(userId);
         return urls.stream().map(this::mapToUrlResponse).toList();
-
     }
 
     public String deleteUrl(String shortCode) {
@@ -108,7 +104,6 @@ public class UrlService {
     private void incrementClickCount(Url url) {
         url.setClickCount(url.getClickCount() + 1);
         urlRepo.saveUrl(url);
-
     }
 
     public UrlResponse mapToUrlResponse(Url url) {
