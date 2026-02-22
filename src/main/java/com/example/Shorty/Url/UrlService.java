@@ -39,8 +39,9 @@ public class UrlService {
         if (!urlValidator.isValid(request.getOriginalUrl())) {
             throw new BadRequestException("Invalid Url format");
         }
+        log.info("original url : " + request.getOriginalUrl() + "ExpAt: " + request.getExpiresInMins());
 
-        Instant expiresIn = Instant.now().plus(request.getExpiresInMin(), ChronoUnit.MINUTES);
+        Instant expiresIn = Instant.now().plus(request.getExpiresInMins(), ChronoUnit.MINUTES);
 
         String urlId = UUID.randomUUID().toString();
         String shortCode = shortCodeGenerator.generateShortCode(urlId, request.getOriginalUrl());
@@ -57,13 +58,16 @@ public class UrlService {
                 .build();
 
         Url savedUrl = urlRepo.saveUrl(url);
+        log.info("exp :" + savedUrl.getExpiresAt() + " CrtAt: " + savedUrl.getCreatedAt());
         cacheService.cacheUrl(savedUrl.getShortCode(), savedUrl.getOriginalUrl(), savedUrl.getId());
         return mapToUrlResponse(savedUrl);
     }
 
     public String getOriginalUrl(String shortCode) {
 
+//        log.info("ShortCode :" + shortCode);
         String cachedUrl = cacheService.getCachedUrl(shortCode);
+//        log.info("CachedUrl :" + cachedUrl);
         if (cachedUrl != null) {
             cacheService.increaseCount(shortCode);
             return cachedUrl;
@@ -72,9 +76,10 @@ public class UrlService {
         Url url = urlRepo.findByShortCode(shortCode).orElseThrow(
                 () -> new ResourceNotFoundException("Url Not Found")
         );
+//        log.info("url :" + url);
 
         if (url.getExpiresAt() != null && url.getExpiresAt().isBefore(Instant.now())) {
-            throw new ResourceNotFoundException("Url Not Found");
+            throw new ResourceNotFoundException("Url Expired");
         }
 
         if (!url.isActive()) {

@@ -9,6 +9,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -33,7 +34,7 @@ public class RedisCacheService {
         try {
             String key = URL_CACHE_PREFIX + shortCode;
             redisTemplate.opsForValue().set(key, originalUrl, DEFAULT_TTL);
-            redisTemplate.opsForValue().set(URL_CACHE_PREFIX + shortCode, urlId, DEFAULT_TTL);
+            redisTemplate.opsForValue().set(URL_ID_PREFIX + shortCode, urlId, DEFAULT_TTL);
         } catch (Exception e) {
             log.error("Failed to cache URL: {}", shortCode, e);
         }

@@ -3,12 +3,14 @@ package com.example.Shorty.security;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 
 
+@Slf4j
 @Component
 public class CookieBuilder {
 
@@ -47,6 +49,7 @@ public class CookieBuilder {
         }
 
         ResponseCookie responseCookie = cookieBuilder.build();
+//        log.info("Cookie " + responseCookie);
         response.addHeader(HttpHeaders.SET_COOKIE, responseCookie.toString());
 
     }

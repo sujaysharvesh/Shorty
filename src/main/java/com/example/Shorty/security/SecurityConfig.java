@@ -47,9 +47,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/api/v1/user/register",
-                                "/api/v1/user/login").permitAll()
+                                "/api/v1/user/login", "api/v1/{shortCode}").permitAll()
                         .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/{shortCode}").permitAll()
+//                        .requestMatchers(HttpMethod.GET, "api/v1/{shortCode}").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session ->
