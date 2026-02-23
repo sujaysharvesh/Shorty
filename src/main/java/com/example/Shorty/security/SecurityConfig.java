@@ -1,6 +1,8 @@
 package com.example.Shorty.security;
 
 
+import com.example.Shorty.ratelimit.RateLimitFilter;
+import com.example.Shorty.ratelimit.RateLimitService;
 import com.example.Shorty.security.oauth.OAuth2AuthenticationFailureHandler;
 import com.example.Shorty.security.oauth.OAuth2AuthenticationSuccessHandler;
 import jakarta.servlet.http.HttpServletResponse;
@@ -35,7 +37,7 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final OAuth2AuthenticationFailureHandler oauth2AuthenticationFailureHandler;
     private final OAuth2AuthenticationSuccessHandler oauth2AuthenticationSuccessHandler;
-
+    private final RateLimitFilter rateLimitFilter;
 
 
 
@@ -84,6 +86,7 @@ public class SecurityConfig {
                         .successHandler(oauth2AuthenticationSuccessHandler)
                         .failureHandler(oauth2AuthenticationFailureHandler)
                 )
+                .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
 
