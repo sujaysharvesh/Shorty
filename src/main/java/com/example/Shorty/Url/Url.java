@@ -1,6 +1,6 @@
 package com.example.Shorty.Url;
 
-import com.example.Shorty.BaseModel;
+import com.example.Shorty.common.model.BaseModel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -1,6 +1,6 @@
 package com.example.Shorty.user;
 
-import com.example.Shorty.BaseModel;
+import com.example.Shorty.common.model.BaseModel;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbAttribute;

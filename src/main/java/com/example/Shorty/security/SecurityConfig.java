@@ -49,7 +49,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/api/v1/user/register",
-                                "/api/v1/user/login", "api/v1/{shortCode}").permitAll()
+                                "/api/v1/user/login", "/api/v1/{shortCode}").permitAll()
                         .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
 //                        .requestMatchers(HttpMethod.GET, "api/v1/{shortCode}").permitAll()
                         .anyRequest().authenticated()
@@ -97,7 +97,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList(
-                "http://localhost:2002", "http://localhost:3000"
+                "http://localhost:2002", "http://localhost:3000", "https://shorty-url-one.vercel.app"
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));

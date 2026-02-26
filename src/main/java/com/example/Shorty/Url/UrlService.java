@@ -1,8 +1,8 @@
 package com.example.Shorty.Url;
 
 
-import com.example.Shorty.DTOs.Urls.CreateUrlRequest;
-import com.example.Shorty.DTOs.Urls.UrlResponse;
+import com.example.Shorty.Url.dto.CreateUrlRequest;
+import com.example.Shorty.Url.dto.UrlResponse;
 import com.example.Shorty.exception.BadRequestException;
 import com.example.Shorty.exception.ResourceNotFoundException;
 import com.example.Shorty.user.UserService;

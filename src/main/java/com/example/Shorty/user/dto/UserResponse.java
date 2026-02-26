@@ -1,4 +1,4 @@
-package com.example.Shorty.DTOs.UserDtos;
+package com.example.Shorty.user.dto;
 
 import com.example.Shorty.user.Role;
 import com.fasterxml.jackson.annotation.JsonInclude;

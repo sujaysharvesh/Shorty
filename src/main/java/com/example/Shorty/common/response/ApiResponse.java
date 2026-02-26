@@ -1,6 +1,5 @@
-package com.example.Shorty.DTOs;
+package com.example.Shorty.common.response;
 
-import com.example.Shorty.DTOs.Urls.UrlResponse;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;

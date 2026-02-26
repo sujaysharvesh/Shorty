@@ -1,4 +1,4 @@
-package com.example.Shorty.DTOs.UserDtos;
+package com.example.Shorty.user.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -2,12 +2,10 @@ package com.example.Shorty.user;
 
 
 
-import com.example.Shorty.DTOs.ApiResponse;
-import com.example.Shorty.DTOs.UserDtos.CredentialsRequest;
-import com.example.Shorty.DTOs.UserDtos.RegisterRequest;
-import com.example.Shorty.DTOs.UserDtos.UserResponse;
-import com.example.Shorty.exception.BadRequestException;
-import com.example.Shorty.exception.ResourceNotFoundException;
+import com.example.Shorty.common.response.ApiResponse;
+import com.example.Shorty.user.dto.CredentialsRequest;
+import com.example.Shorty.user.dto.RegisterRequest;
+import com.example.Shorty.user.dto.UserResponse;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/user")

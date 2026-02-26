@@ -1,9 +1,9 @@
 package com.example.Shorty.user;
 
 
-import com.example.Shorty.DTOs.UserDtos.CredentialsRequest;
-import com.example.Shorty.DTOs.UserDtos.RegisterRequest;
-import com.example.Shorty.DTOs.UserDtos.UserResponse;
+import com.example.Shorty.user.dto.CredentialsRequest;
+import com.example.Shorty.user.dto.RegisterRequest;
+import com.example.Shorty.user.dto.UserResponse;
 import com.example.Shorty.Utils.JwtUtils;
 import com.example.Shorty.exception.UnauthorizedException;
 import com.example.Shorty.exception.BadRequestException;

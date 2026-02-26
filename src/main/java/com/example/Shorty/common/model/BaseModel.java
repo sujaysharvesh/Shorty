@@ -1,4 +1,4 @@
-package com.example.Shorty;
+package com.example.Shorty.common.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

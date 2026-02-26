@@ -29,24 +29,24 @@ public class CookieBuilder {
     @Value("${app.environment}")
     private String environment;
 
-    @Value("${app.jwt.cookie-samesite}")
-    private String sameSite;
+//    @Value("${app.jwt.cookie-samesite}")
+//    private String sameSite;
 
+    private boolean isProduction = isProduction();
+    private boolean isSecure = isProduction;
 
     public void setJwtCookie(HttpServletResponse response, String token) {
-        boolean isProduction = isProduction();
-        boolean isSecure = isProduction;
 
         ResponseCookie.ResponseCookieBuilder cookieBuilder = ResponseCookie.from(jwtCookieName, token)
                 .httpOnly(true)
                 .secure(isSecure)
                 .path(cookiePath)
                 .maxAge(cookieMaxAge)
-                .sameSite(sameSite);
+                .sameSite(isSecure ? "None" : "Lax");
 
-        if(!cookieDomain.isEmpty() && !cookieDomain.contains("localhost")) {
-            cookieBuilder.domain(cookieDomain);
-        }
+//        if(!cookieDomain.isEmpty() && !cookieDomain.contains("localhost")) {
+//            cookieBuilder.domain(cookieDomain);
+//        }
 
         ResponseCookie responseCookie = cookieBuilder.build();
 //        log.info("Cookie " + responseCookie);
@@ -59,14 +59,14 @@ public class CookieBuilder {
         ResponseCookie.ResponseCookieBuilder cookieBuilder =
                 ResponseCookie.from(jwtCookieName, "")
                         .httpOnly(true)
-                        .secure(isProduction())
+                        .secure(true)
                         .path(cookiePath)
                         .maxAge(0)
-                        .sameSite(sameSite);
+                        .sameSite(isSecure ? "None" : "Lax");
 
-        if (!cookieDomain.isEmpty() && !cookieDomain.contains("localhost")) {
-            cookieBuilder.domain(cookieDomain);
-        }
+//        if (!cookieDomain.isEmpty() && !cookieDomain.contains("localhost")) {
+//            cookieBuilder.domain(cookieDomain);
+//        }
 
         ResponseCookie responseCookie = cookieBuilder.build();
         response.addHeader(HttpHeaders.SET_COOKIE, responseCookie.toString());

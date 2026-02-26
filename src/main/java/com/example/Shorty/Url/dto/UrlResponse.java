@@ -1,8 +1,7 @@
-package com.example.Shorty.DTOs.Urls;
+package com.example.Shorty.Url.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
-import org.springframework.web.bind.annotation.GetMapping;
 
 import java.time.Instant;
 
